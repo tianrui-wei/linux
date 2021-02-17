@@ -1,0 +1,15 @@
+~/research/qemu/objdir/riscv64-softmmu/qemu-system-riscv64 \
+-M virt-cosim \
+-smp 4 \
+-serial stdio \
+-display none \
+-m 2G \
+-bios opensbi-riscv64-virt-fw_jump.bin \
+-kernel Image \
+-append root=/dev/vda ro console=ttyS0 \
+-drive file=~/research/busybox/busybox,format=raw,id=hd0 \
+-object rng-random,filename=/dev/urandom,id=rng0 \
+-device virtio-rng-device,rng=rng0-device \
+-device virtio-net-device,netdev=usernet \
+-netdev user,id=usernet \
+-machine dumpdtb=virt.dtb
