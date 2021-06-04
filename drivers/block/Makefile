@@ -20,6 +20,7 @@ obj-$(CONFIG_AMIGA_Z2RAM)	+= z2ram.o
 obj-$(CONFIG_N64CART)		+= n64cart.o
 obj-$(CONFIG_BLK_DEV_RAM)	+= brd.o
 obj-$(CONFIG_BLK_DEV_LOOP)	+= loop.o
+obj-$(CONFIG_OPENPITON_ARIANE_RAMDISK) += piton_sd.o
 obj-$(CONFIG_XILINX_SYSACE)	+= xsysace.o
 obj-$(CONFIG_CDROM_PKTCDVD)	+= pktcdvd.o
 obj-$(CONFIG_SUNVDC)		+= sunvdc.o
