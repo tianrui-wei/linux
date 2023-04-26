@@ -1120,3 +1120,16 @@ config MMC_LITEX
 	  module will be called litex_mmc.
 
 	  If unsure, say N.
+
+config MMC_PITON
+	tristate "OpenPiton MMC Host Controller support"
+	depends on RISCV|| COMPILE_TEST
+	select REGULATOR
+	select REGULATOR_FIXED_VOLTAGE
+	help
+	  This selects support for the MMC Host Controller found in OpenPiton SoCs.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called piton_mmc.
+
+	  If unsure, say N.
