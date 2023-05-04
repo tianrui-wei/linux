@@ -165,11 +165,12 @@ static int piton_mmc_probe(struct platform_device *pdev)
 
 
 	/* Force 4-bit bus_width (only width supported by hardware) */
-	mmc->caps = ~MMC_CAP_8_BIT_DATA;
+	mmc->caps = 0;
+	mmc->caps |= ~MMC_CAP_8_BIT_DATA;
 	mmc->caps |= MMC_CAP_4_BIT_DATA;
 
 	/* Set default capabilities */
-	mmc->caps2 |= MMC_CAP2_NO_WRITE_PROTECT |
+	mmc->caps2 = MMC_CAP2_NO_WRITE_PROTECT |
 		      MMC_CAP2_NO_SDIO |
 		      MMC_CAP2_NO_MMC;
 
