@@ -103,9 +103,14 @@ static void piton_mmc_request(struct mmc_host *mmc, struct mmc_request *req)
 	mmc_request_done(mmc, req);
 }
 
+static void litex_mmc_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
+{
+    return;
+}
 static const struct mmc_host_ops piton_mmc_ops = {
 	.get_cd = piton_mmc_get_cd,
 	.request = piton_mmc_request,
+    .set_ios = piton_mmc_set_ios,
 };
 
 static void piton_mmc_free_host_wrapper(void *mmc)
