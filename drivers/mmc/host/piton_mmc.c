@@ -123,8 +123,9 @@ static int piton_mmc_probe(struct platform_device *pdev)
     pr_info("piton_mmc_probe\n");
 
     res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+    res->end = res->start + 0x1000000;
 
-	mmc = mmc_alloc_host(sizeof(struct piton_mmc_host), dev);
+    mmc = mmc_alloc_host(sizeof(struct piton_mmc_host), dev);
 	if (!mmc)
 		return -ENOMEM;
 
@@ -146,8 +147,10 @@ static int piton_mmc_probe(struct platform_device *pdev)
 
 
 	mmc->ops = &piton_mmc_ops;
+    //FIXME
+	mmc->ocr_avail = MMC_VDD_32_33 | MMC_VDD_33_34;
 
-	ret = mmc_regulator_get_supply(mmc);
+    ret = mmc_regulator_get_supply(mmc);
 	if (ret || mmc->ocr_avail == 0) {
 		dev_warn(dev, "can't get voltage, defaulting to 3.3V\n");
 		mmc->ocr_avail = MMC_VDD_32_33 | MMC_VDD_33_34;
@@ -160,9 +163,6 @@ static int piton_mmc_probe(struct platform_device *pdev)
 	mmc->f_min = 12.5e6;
 	mmc->f_max = 50e6;
 
-	ret = mmc_of_parse(mmc);
-	if (ret)
-		return ret;
 
 	/* Force 4-bit bus_width (only width supported by hardware) */
 	mmc->caps = ~MMC_CAP_8_BIT_DATA;
@@ -177,6 +177,10 @@ static int piton_mmc_probe(struct platform_device *pdev)
 	mmc->max_blk_count = 65535;
 	mmc->max_req_size = mmc->max_blk_size * mmc->max_blk_count;
 	mmc->max_seg_size = mmc->max_req_size;
+
+	ret = mmc_of_parse(mmc);
+	if (ret)
+		return ret;
 
 	ret = mmc_add_host(mmc);
 	if (ret)
