@@ -195,7 +195,7 @@ static int piton_mmc_remove(struct platform_device *pdev)
 }
 
 static const struct of_device_id piton_match[] = {
-	{ .compatible = "piton,mmc" },
+	{ .compatible = "openpiton,piton-mmc" },
 	{ }
 };
 MODULE_DEVICE_TABLE(of, piton_match);
@@ -204,7 +204,7 @@ static struct platform_driver piton_mmc_driver = {
 	.probe = piton_mmc_probe,
 	.remove = piton_mmc_remove,
 	.driver = {
-		.name = "openpiton,piton-mmc",
+		.name = "piton-mmc",
 		.of_match_table = piton_match,
 	},
 };
