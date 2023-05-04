@@ -27,6 +27,7 @@
 #include <linux/mmc/mmc.h>
 #include <linux/mmc/sd.h>
 
+#define DEBUG
 
 struct piton_mmc_host {
 	struct mmc_host *mmc;
