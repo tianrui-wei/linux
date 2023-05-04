@@ -122,6 +122,8 @@ static int piton_mmc_probe(struct platform_device *pdev)
 	int ret;
     pr_info("piton_mmc_probe\n");
 
+    res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+
 	mmc = mmc_alloc_host(sizeof(struct piton_mmc_host), dev);
 	if (!mmc)
 		return -ENOMEM;
@@ -202,7 +204,7 @@ static struct platform_driver piton_mmc_driver = {
 	.probe = piton_mmc_probe,
 	.remove = piton_mmc_remove,
 	.driver = {
-		.name = "piton-mmc",
+		.name = "openpiton,piton-mmc",
 		.of_match_table = piton_match,
 	},
 };
