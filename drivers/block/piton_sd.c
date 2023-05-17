@@ -150,6 +150,11 @@ static int piton_sd_init(void)
         piton_sd_major = result;
     }
 
+    if (blk_mq_alloc_tag_set(tag_set)) {
+        printk(KERN_ERR "%s: blk_mq_alloc_tag_set() returned error. \n", DRV_NAME);
+        goto fail;
+    }
+
     queue = blk_mq_init_queue(tag_set);
     if (queue == NULL) {
         printk(KERN_ERR "%s: blk_alloc_queue() returned NULL. \n", DRV_NAME);
