@@ -150,6 +150,18 @@ static int piton_sd_init(void)
         piton_sd_major = result;
     }
 
+    tag_set = kzalloc(sizeof(struct blk_mq_tag_set), GFP_KERNEL);
+    if (!tag_set) {
+        printk(KERN_ERR "%s: kzalloc() returned NULL. \n", DRV_NAME);
+        goto fail;
+    }
+
+	tag_set->nr_hw_queues = 1;
+	tag_set->nr_maps = 1;
+	tag_set->queue_depth = 16;
+	tag_set->numa_node = NUMA_NO_NODE;
+	tag_set->flags = BLK_MQ_F_BLOCKING;
+
     if (blk_mq_alloc_tag_set(tag_set)) {
         printk(KERN_ERR "%s: blk_mq_alloc_tag_set() returned error. \n", DRV_NAME);
         goto fail;
