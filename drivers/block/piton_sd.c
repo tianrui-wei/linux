@@ -1,7 +1,7 @@
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/fs.h>
-#include <linux/blk-mq.h>
+#include <linux/blkdev.h>
 #include <asm-generic/io.h>
 
 #define DRV_NAME     "piton_sd"
@@ -55,7 +55,6 @@ typedef struct partition_entries
 static int piton_sd_major = 0;
 static char * piton_sd_name = "piton_sd";
 static struct gendisk  *piton_sd_gendisk;
-static struct blk_mq_tag_set *tag_set;
 
 static void __iomem * piton_sd_base_addr;
 
@@ -100,8 +99,6 @@ static struct block_device_operations piton_sd_bdev_ops = {
 static int piton_sd_init(void)
 {
     static unsigned int version_printed = 0;
-    struct request_queue *queue = NULL;
-
     int result;
     uint8_t lba_buf[PITON_SD_BLOCK_SIZE];
     gpt_pth_t * pth;
@@ -150,19 +147,16 @@ static int piton_sd_init(void)
         piton_sd_major = result;
     }
 
-    queue = blk_mq_init_queue(tag_set);
-    if (queue == NULL) {
-        printk(KERN_ERR "%s: blk_alloc_queue() returned NULL. \n", DRV_NAME);
+    piton_sd_gendisk = blk_alloc_disk(PITON_SD_NMINORS);
+    if (piton_sd_gendisk == NULL) {
+        printk(KERN_ERR "%s: alloc_disk() returned NULL. \n", DRV_NAME);
         goto fail;
     }
 
-    piton_sd_gendisk = blk_mq_alloc_disk(tag_set, queue);
-    if (IS_ERR(piton_sd_gendisk)) {
-        printk(KERN_ERR "%s: blk_alloc_disk() returned error. \n", DRV_NAME);
-        goto fail;
-    }
+    blk_queue_flag_set(QUEUE_FLAG_SYNCHRONOUS, piton_sd_gendisk->queue);
+    blk_queue_flag_set(QUEUE_FLAG_FAIL_IO, piton_sd_gendisk->queue);
+	blk_queue_physical_block_size(piton_sd_gendisk->queue, PAGE_SIZE);
 
-    piton_sd_gendisk->queue = queue;
     piton_sd_gendisk->major = piton_sd_major;
     piton_sd_gendisk->first_minor = 0;
     snprintf(piton_sd_gendisk->disk_name, 32, "%s", piton_sd_name);
@@ -170,16 +164,12 @@ static int piton_sd_init(void)
     set_capacity(piton_sd_gendisk, pth->backup_lba + 1);
     return add_disk(piton_sd_gendisk);
 
+    return 0;
+
+
 fail:
     unregister_blkdev(piton_sd_major, piton_sd_name);
 
-    if (queue) {
-	    blk_mq_destroy_queue(queue);
-    }
-
-    if (tag_set) {
-        blk_mq_free_tag_set(tag_set);
-    }
     return -EIO;
 }
 
@@ -188,7 +178,6 @@ static void piton_sd_exit(void)
 {
     del_gendisk(piton_sd_gendisk);
     put_disk(piton_sd_gendisk);
-    blk_put_queue(piton_sd_gendisk->queue);
 
     unregister_blkdev(piton_sd_major, piton_sd_name);
 
