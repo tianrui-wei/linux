@@ -159,6 +159,7 @@ static int piton_sd_init(void)
 	blk_queue_physical_block_size(piton_sd_gendisk->queue, PAGE_SIZE);
 
     piton_sd_gendisk->major = piton_sd_major;
+    piton_sd_gendisk->minors = PITON_SD_NMINORS;
     piton_sd_gendisk->first_minor = 0;
     snprintf(piton_sd_gendisk->disk_name, 32, "%s", piton_sd_name);
     piton_sd_gendisk->fops = &piton_sd_bdev_ops;
